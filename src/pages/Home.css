@@ -1,0 +1,415 @@
+.home-page {
+  overflow-x: hidden;
+}
+
+/* Alternates with the sections around it so consecutive blocks never share a
+   background: hero (navy) -> secondary -> base -> secondary -> base. */
+.about-section {
+  padding: 100px 0;
+  background: var(--bg-secondary);
+}
+
+.about-text {
+  max-width: 760px;
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.about-text a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.about-text a:hover {
+  text-decoration: underline;
+}
+
+/* Short value strip: the long-form product story stays on /about. */
+.home-value-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.home-value-grid > .scroll-reveal {
+  display: flex;
+}
+
+.home-value-card {
+  flex: 1;
+  padding: 28px 26px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+
+.home-value-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-200);
+  box-shadow: var(--shadow-md);
+}
+
+.home-value-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-50);
+  color: var(--primary);
+}
+
+.home-value-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.home-value-desc {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* Choose Your Resume Path Section */
+.home-choose-section {
+  padding: 100px 0;
+  background: var(--bg);
+}
+
+.home-choose-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* ScrollReveal wraps every card, so the wrapper is the grid item and the card
+   needs flex: 1 to stretch to the row height set by the tallest sibling. */
+.home-choose-grid > .scroll-reveal {
+  display: flex;
+}
+
+.home-choose-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 28px;
+  background: var(--card-bg);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.home-choose-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+/* Explicit modifiers, not :nth-child — the ScrollReveal wrapper sits between the
+   grid and the card, which made every card :nth-child(1) and left 2 and 3 dead. */
+.home-choose-card--1::before {
+  background: linear-gradient(90deg, var(--primary), var(--accent-light));
+}
+
+.home-choose-card--2::before {
+  background: linear-gradient(90deg, var(--accent), #93C5FD);
+}
+
+.home-choose-card--3::before {
+  background: linear-gradient(90deg, var(--primary-light), var(--accent));
+}
+
+.home-choose-card--4::before {
+  background: linear-gradient(90deg, var(--accent), var(--primary-light));
+}
+
+.home-choose-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-200);
+}
+
+.home-choose-card:hover::before {
+  opacity: 1;
+}
+
+.home-choose-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary-50);
+  color: var(--primary);
+  margin-bottom: 24px;
+  transition: all var(--transition);
+}
+
+.home-choose-card:hover .home-choose-icon {
+  background: var(--primary);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.home-choose-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.home-choose-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+.home-choose-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  transition: color var(--transition);
+}
+
+.home-choose-card:hover .home-choose-link {
+  color: var(--primary);
+}
+
+/* Features Section */
+.features-section {
+  padding: 100px 0;
+  background: var(--bg-secondary);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+  padding: 100px 0;
+  background: var(--bg);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  position: relative;
+}
+
+.step-card {
+  text-align: center;
+  position: relative;
+  padding: 0 20px;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 14px rgba(11, 31, 58, 0.3);
+}
+
+.step-connector {
+  position: absolute;
+  top: 28px;
+  left: calc(50% + 40px);
+  width: calc(100% - 80px);
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-200), var(--primary-100));
+}
+
+.step-connector.hidden {
+  display: none;
+}
+
+.step-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.step-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 80px 0 100px;
+  background: var(--bg-secondary);
+}
+
+.cta-card {
+  position: relative;
+  background: linear-gradient(135deg, var(--primary), var(--deep-navy), var(--primary-dark));
+  border-radius: var(--radius-xl);
+  padding: 64px 40px;
+  text-align: center;
+  overflow: hidden;
+  color: #fff;
+}
+
+.cta-bg-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cta-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cta-shape-1 {
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  right: -50px;
+}
+
+.cta-shape-2 {
+  width: 200px;
+  height: 200px;
+  bottom: -80px;
+  left: -40px;
+}
+
+.cta-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.cta-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 500px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+  position: relative;
+}
+
+.cta-buttons {
+  position: relative;
+}
+
+.cta-buttons .btn-primary {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  padding: 16px 36px;
+  font-size: 1.05rem;
+}
+
+.cta-buttons .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .steps-grid {
+    gap: 24px;
+  }
+
+  .home-choose-grid,
+  .home-value-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .features-section,
+  .how-it-works-section,
+  .cta-section,
+  .about-section,
+  .home-choose-section {
+    padding: 64px 0;
+  }
+
+  .about-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .home-choose-grid,
+  .home-value-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .home-value-card {
+    padding: 24px 22px;
+  }
+
+  .step-connector {
+    display: none;
+  }
+
+  .cta-card {
+    padding: 48px 24px;
+  }
+
+  .cta-title {
+    font-size: 1.75rem;
+  }
+
+  .cta-description {
+    font-size: 1rem;
+  }
+}

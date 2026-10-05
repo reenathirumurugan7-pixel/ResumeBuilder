@@ -1,0 +1,41 @@
+.education-section {
+  /* Inherits styles from PersonalInfo.css form-section */
+}
+
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: var(--bg);
+  transition: all var(--transition);
+  appearance: auto;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+@media (max-width: 768px) {
+  .form-select {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Compact mode toggle for the CGPA / Percentage control so it sits neatly
+   above the value input/dropdown within the same 3-column education row. */
+.cgpa-mode-select {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--primary);
+  background: var(--primary-50);
+  border-color: var(--primary-200);
+  font-weight: 600;
+}

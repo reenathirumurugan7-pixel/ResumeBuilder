@@ -1,0 +1,98 @@
+.skeleton {
+  background: var(--border-light, #e2e8f0);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border-light, #e2e8f0) 25%,
+    var(--bg-secondary, #f1f5f9) 50%,
+    var(--border-light, #e2e8f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.skeleton-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
+}
+
+.skeleton-resume-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
+}
+
+.skeleton-resume-card-preview {
+  padding: 16px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.skeleton-resume-card-header {
+  height: 80px;
+  background: linear-gradient(
+    90deg,
+    var(--border-light, #e2e8f0) 25%,
+    var(--bg-secondary, #f1f5f9) 50%,
+    var(--border-light, #e2e8f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.skeleton-resume-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-resume-card-info {
+  padding: 16px;
+}
+
+.skeleton-resume {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  padding: 32px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.skeleton-resume-header {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-resume-section {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-resume-card-header {
+    animation: none;
+  }
+}

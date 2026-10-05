@@ -1,0 +1,78 @@
+.qr-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.qr-setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qr-setting-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+}
+
+.qr-setting-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted, #64748b);
+  max-width: 420px;
+}
+
+.qr-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.qr-toggle-track {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  transition: background var(--transition, 0.2s ease);
+}
+
+.qr-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition, 0.2s ease);
+}
+
+.qr-toggle-on .qr-toggle-track {
+  background: var(--primary, #2563eb);
+}
+
+.qr-toggle-on .qr-toggle-thumb {
+  transform: translateX(22px);
+}
+
+.qr-toggle-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary, #475569);
+  letter-spacing: 0.5px;
+  min-width: 28px;
+  text-align: left;
+}
+
+.qr-toggle-on .qr-toggle-text {
+  color: var(--primary, #2563eb);
+}

@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Service-account and other credential material. The app itself never needs any
+# of these (it uses the browser Firebase SDK and verifies ID tokens with Google's
+# public certificates), so their presence in the working tree always means a key
+# was copied in by mistake and must not be committed.
+serviceAccount.json
+*serviceAccount*.json
+firebase-adminsdk*.json
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,378 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* ---- Brand / action: BLUE = actions, highlights and active states ---- */
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-light: #60A5FA;
+  --primary-dark: #1D4ED8;
+  --primary-50: #EFF6FF;
+  --primary-100: #DBEAFE;
+  --primary-200: #BFDBFE;
+
+  /* ---- Structure: NAVY = headers, navigation, page structure ---- */
+  --navy: #0F172A;
+  --navy-secondary: #1E293B;
+  --navy-tertiary: #020617;
+  --deep-navy: #0F172A;
+
+  --accent: #2563EB;
+  --accent-light: #60A5FA;
+
+  /* ---- Text ---- */
+  --heading: #0F172A;
+--text-primary: #111827;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  /* Light theme keeps a 3-tier slate hierarchy (7.58:1 / 4.76:1), so
+     --text-muted never drops below WCAG AA even though it is also used
+     for readable hint text. Form placeholders keep the lighter slate. */
+  --placeholder: #94A3B8;
+  --text-on-primary: #FFFFFF;
+
+  /* ---- Surfaces ---- */
+  --bg: #FFFFFF;
+  --bg-secondary: #F8FAFC;
+  --bg-section: #F1F5F9;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-strong: rgba(255, 255, 255, 0.85);
+  --card-bg: #FFFFFF;
+  --input-bg: #FFFFFF;
+
+  /* ---- Borders ---- */
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
+  --border-strong: #CBD5E1;
+  /* Alias: several component stylesheets already reference --border-color.
+     It was never defined, so every one of those uses silently fell back to a
+     hardcoded hex. Declaring it here points them all at the theme border. */
+  --border-color: #E2E8F0;
+
+  /* ---- Status: green = success, red = destructive, orange = warning ---- */
+  --success: #16A34A;
+  --success-hover: #15803D;
+  --success-light: #DCFCE7;
+  --success-border: #BBF7D0;
+
+  --danger: #DC2626;
+  --danger-hover: #B91C1C;
+  --danger-light: #FEE2E2;
+  --danger-border: #FECACA;
+  --danger-light-hover: #FEE2E2;
+
+  --warning: #D97706;
+  --warning-hover: #B45309;
+  --warning-light: #FEF3C7;
+  --warning-border: #FDE68A;
+
+  --info: #0284C7;
+  --info-hover: #0369A1;
+  --info-light: #E0F2FE;
+  --info-border: #BAE6FD;
+
+  /* ---- Focus ring: subtle blue, used instead of removing outlines ---- */
+  --focus-ring: rgba(37, 99, 235, 0.35);
+  --focus-ring-danger: rgba(220, 38, 38, 0.35);
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --primary: #3B82F6;
+  --primary-hover: #60A5FA;
+  --primary-light: #60A5FA;
+  --primary-dark: #1D4ED8;
+  --primary-50: #1E293B;
+  --primary-100: #1E3A5F;
+  --primary-200: #2D4A7A;
+
+  --navy: #0B1120;
+  --navy-secondary: #1E293B;
+  --navy-tertiary: #020617;
+  --deep-navy: #0F172A;
+
+  --accent: #60A5FA;
+  --accent-light: #93C5FD;
+
+  --heading: #F8FAFC;
+  --text-primary: #F8FAFC;
+--text-secondary: #94A3B8;
+  --text-muted: #7C8CA0;
+  --placeholder: #64748B;
+  --text-on-primary: #FFFFFF;
+
+  --bg: #0B1120;
+  --bg-secondary: #1E293B;
+  --bg-section: #1E293B;
+  --bg-glass: rgba(11, 17, 32, 0.8);
+  --bg-glass-strong: rgba(30, 41, 59, 0.9);
+  --card-bg: #111827;
+  --input-bg: #0F172A;
+
+  --border: #334155;
+  --border-light: #1E293B;
+  --border-strong: #475569;
+  --border-color: #334155;
+
+  --success: #22C55E;
+  --success-hover: #16A34A;
+  --danger: #EF4444;
+  --danger-hover: #DC2626;
+  --warning: #FBBF24;
+  --info: #38BDF8;
+
+  --success-light: #123324;
+  --success-border: #1f5c3e;
+  --danger-light: #38161a;
+  --danger-border: #6b2a30;
+  --danger-light-hover: #4a1c22;
+  --warning-light: #382d12;
+  --warning-border: #6b541f;
+  --info-light: #0c2c40;
+  --info-border: #155e75;
+
+  --focus-ring: rgba(96, 165, 250, 0.4);
+  --focus-ring-danger: rgba(239, 68, 68, 0.4);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: var(--font);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+input, textarea, select {
+  font-family: var(--font);
+  font-size: 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.36);
+}
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--heading);
+  border: 2px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-secondary);
+  color: var(--primary);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: var(--text-on-primary);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.28);
+}
+
+.btn-danger:hover {
+  background: var(--danger-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.36);
+}
+
+.btn:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn-sm {
+  padding: 8px 20px;
+  font-size: 0.875rem;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--heading), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto 48px;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes authSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+

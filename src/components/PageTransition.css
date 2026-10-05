@@ -1,0 +1,43 @@
+.page-transition {
+  position: relative;
+  width: 100%;
+}
+
+.pt-exit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  pointer-events: none;
+  animation: pt-exit-fade 0.16s ease-in forwards;
+}
+
+.pt-enter--active {
+  animation: pt-enter-rise 0.38s ease-out backwards;
+}
+
+@keyframes pt-exit-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pt-enter-rise {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-exit,
+  .pt-enter--active {
+    animation: none;
+  }
+}

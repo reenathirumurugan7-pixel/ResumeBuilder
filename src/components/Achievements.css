@@ -1,0 +1,34 @@
+.achievement-entry {
+  margin-bottom: 10px;
+}
+
+.achievement-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-section);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}
+
+.achievement-row .entry-number {
+  flex-shrink: 0;
+}
+
+.achievement-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 6px 0;
+}
+
+.achievement-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.achievement-row .entry-remove {
+  flex-shrink: 0;
+  padding: 4px 8px;
+}

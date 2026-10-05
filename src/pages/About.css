@@ -1,0 +1,240 @@
+.about-page {
+  overflow-x: hidden;
+}
+
+.about-hero {
+  padding: 140px 0 80px;
+  text-align: center;
+  background: linear-gradient(170deg, var(--navy) 0%, var(--navy-secondary) 45%, var(--navy-tertiary) 100%);
+}
+
+.about-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.about-description {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.75;
+}
+
+/* Mission */
+.about-mission {
+  padding: 80px 0;
+}
+
+.mission-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
+}
+
+.mission-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-200);
+}
+
+.mission-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  margin-bottom: 24px;
+}
+
+.mission-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: var(--text-primary);
+}
+
+.mission-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Why Section */
+.about-why {
+  padding: 80px 0;
+  background: var(--bg-secondary);
+}
+
+.reasons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.reason-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.reason-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-200);
+}
+
+.reason-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--primary-50);
+  color: var(--primary);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  transition: all var(--transition);
+}
+
+.reason-card:hover .reason-icon {
+  background: var(--primary);
+  color: #fff;
+}
+
+.reason-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.reason-description {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* CTA */
+.about-cta {
+  padding: 80px 0;
+}
+
+.about-cta-card {
+  background: linear-gradient(135deg, var(--primary), var(--deep-navy), var(--primary-dark));
+  border-radius: var(--radius-xl);
+  padding: 56px 40px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-cta-card::before {
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  top: -80px;
+  right: -40px;
+}
+
+.about-cta-card::after {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  bottom: -60px;
+  left: -30px;
+}
+
+.about-cta-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.about-cta-text {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.about-cta-btn {
+  background: #fff;
+  color: var(--primary);
+  padding: 16px 36px;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.about-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .reasons-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 110px 0 60px;
+  }
+
+  .about-title {
+    font-size: 2rem;
+  }
+
+  .about-description {
+    font-size: 1rem;
+  }
+
+  .about-mission,
+  .about-why,
+  .about-cta {
+    padding: 48px 0;
+  }
+
+  .mission-card {
+    padding: 36px 24px;
+  }
+
+  .reasons-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .about-cta-card {
+    padding: 40px 24px;
+  }
+
+  .about-cta-title {
+    font-size: 1.5rem;
+  }
+}

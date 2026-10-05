@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /resumes/{resumeId} {
+
+      function isOwner() {
+        return request.auth != null && request.auth.uid == resource.data.userId;
+      }
+
+      // Public resumes can be read by anyone (unauthenticated or authenticated).
+      // Private resumes can only be read by the authenticated owner.
+      allow read: if resource.data.isPublic == true
+                  || isOwner();
+
+      // Only authenticated users can create resumes.
+      // The creator must set userId to their own UID.
+      // New resumes must be private by default (isPublic must not be true).
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.isPublic != true;
+
+      // Owner edits their own resume: the userId field must be unchanged, and the
+      // write may not include any of the metric counters (so editing a resume can
+      // neither zero nor forge them — they move only through the +1 tallies
+      // below).
+      //
+      // The counters are `views` (a viewer opening a public resume), `qrScans`
+      // (a viewer reaching a public resume through its QR code) and `downloads`
+      // (the owner producing a PDF/DOCX). For each one the client may change
+      // that single field and nothing else, and the new value must be exactly
+      // the stored value plus one. Pinning the bump that way means nobody —
+      // viewer or owner — can bulk-inflate, zero, or forge a counter, while the
+      // atomic FieldValue.increment() still merges correctly under concurrent
+      // writes. `.get(..., 0)` covers documents written before a counter existed.
+      allow update: if (isOwner()
+                          && request.resource.data.userId == resource.data.userId
+                          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['views', 'downloads', 'qrScans']))
+                    || (resource.data.isPublic == true
+                          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+                          && request.resource.data.views is int
+                          && request.resource.data.views >= 1
+                          && request.resource.data.views == resource.data.get('views', 0) + 1)
+                    || (resource.data.isPublic == true
+                          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['qrScans'])
+                          && request.resource.data.qrScans is int
+                          && request.resource.data.qrScans >= 1
+                          && request.resource.data.qrScans == resource.data.get('qrScans', 0) + 1)
+                    || (isOwner()
+                          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads'])
+                          && request.resource.data.downloads is int
+                          && request.resource.data.downloads >= 1
+                          && request.resource.data.downloads == resource.data.get('downloads', 0) + 1);
+
+      // Only the owner can delete their own resume.
+      allow delete: if isOwner();
+
+      // Deny everything else on the resumes collection.
+      allow read, write: if false;
+    }
+
+    // Deny access to everything outside the `resumes` collection.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
