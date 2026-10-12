@@ -14,6 +14,7 @@
   "dependencies": {
     "docx": "^8.5.0",
     "firebase": "^12.18.0",
+    "firebase-admin": "^14.5.0",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.39.0",
     "mammoth": "^1.13.0",

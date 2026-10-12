@@ -155,6 +155,91 @@
   margin-bottom: 16px;
 }
 
+/* ── Preview toolbar / zoom ─────────────────────────── */
+
+.editor-preview-toggle {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 100px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.editor-preview-toggle:hover {
+  color: var(--primary);
+  border-color: var(--primary-100);
+  background: var(--primary-50);
+}
+
+.editor-preview-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+}
+
+.editor-preview-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.editor-preview-tool:hover {
+  background: var(--primary-50);
+  color: var(--primary);
+}
+
+.editor-preview-zoom-label {
+  min-width: 48px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.editor-preview-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--border-light);
+}
+
+.editor-preview-viewport {
+  overflow: auto;
+  max-height: 72vh;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+}
+
+.editor-preview-page {
+  width: 800px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
 /* ── Submit / Download ─────────────────────────────── */
 
 .editor-submit {
@@ -289,6 +374,14 @@
     position: static;
     box-shadow: none;
     border: 1px solid var(--border-light);
+  }
+
+  .editor-preview-toggle {
+    display: inline-flex;
+  }
+
+  .editor-preview-viewport {
+    padding: 8px;
   }
 
   .editor-title {

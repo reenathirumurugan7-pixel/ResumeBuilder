@@ -50,6 +50,21 @@
   overflow: hidden;
 }
 
+.resume-type-default-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
 .resume-type-card::before {
   content: '';
   position: aasolute;

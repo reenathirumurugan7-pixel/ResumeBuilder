@@ -2,10 +2,12 @@ import { useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GraduationCap, Briefcase, Folder, Check } from 'lucide-react'
 import { clearEditorResumeId } from '../utils/resumeStorage'
+import { loadSettings } from '../config/settings'
 import './ResumeType.css'
 
 function ResumeType() {
   const navigate = useNavigate()
+  const defaultResumeType = loadSettings().defaultResumeType
 
   const handleNewFresher = useCallback(() => {
     clearEditorResumeId('fresher_resume_id')
@@ -29,6 +31,7 @@ function ResumeType() {
 
         <div className="resume-type-cards">
           <div className="resume-type-card fresher-card">
+            {defaultResumeType === 'fresher' && <span className="resume-type-default-badge">Default</span>}
             <div className="resume-type-icon fresher-icon">
               <GraduationCap size={40} strokeWidth={1.5} />
             </div>
@@ -55,12 +58,13 @@ function ResumeType() {
                 Career objective
               </li>
             </ul>
-            <button onClick={handleNewFresher} className="btn btn-primary resume-type-btn">
+            <button onClick={handleNewFresher} className="btn btn-primary resume-type-btn" autoFocus={defaultResumeType === 'fresher'}>
               Create Fresher Resume
             </button>
           </div>
 
           <div className="resume-type-card experienced-card">
+            {defaultResumeType === 'experienced' && <span className="resume-type-default-badge">Default</span>}
             <div className="resume-type-icon experienced-icon">
               <Briefcase size={40} strokeWidth={1.5} />
             </div>
@@ -87,7 +91,7 @@ function ResumeType() {
                 Portfolio link
               </li>
             </ul>
-            <button onClick={handleNewExperienced} className="btn btn-primary resume-type-btn">
+            <button onClick={handleNewExperienced} className="btn btn-primary resume-type-btn" autoFocus={defaultResumeType === 'experienced'}>
               Create Experienced Resume
             </button>
           </div>

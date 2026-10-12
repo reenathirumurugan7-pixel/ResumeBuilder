@@ -57,3 +57,134 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+.navbar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  z-index: 1001;
+  transition: all var(--transition);
+}
+
+.navbar-toggle:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+
+.navbar-link:hover {
+  border-color: var(--primary-light);
+  color: var(--primary-hover);
+  background: var(--primary-50);
+}
+
+.navbar-link.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-50);
+}
+
+.navbar-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.navbar-link.active .navbar-link-icon {
+  color: var(--primary);
+}
+
+.navbar-link-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+  .navbar-link {
+    gap: 0;
+  }
+
+  .navbar-link-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-toggle {
+    display: inline-flex;
+  }
+
+  .navbar-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 12px 16px 16px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .navbar-links.open {
+    display: flex;
+  }
+
+  .navbar-link {
+    gap: 10px;
+    padding: 11px 14px;
+    font-size: 0.95rem;
+    justify-content: flex-start;
+    border-color: var(--border);
+    background: var(--card-bg);
+  }
+
+  .navbar-link-icon {
+    display: inline-flex;
+  }
+}

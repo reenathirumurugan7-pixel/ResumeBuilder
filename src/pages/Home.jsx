@@ -17,6 +17,7 @@ import {
 import ScrollReveal from '../components/ScrollReveal'
 import Hero from '../components/Hero'
 import FeatureCard from '../components/FeatureCard'
+import templates from '../data/templates'
 import './Home.css'
 
 function Home() {
@@ -58,7 +59,7 @@ function Home() {
   const values = [
     {
       icon: <LayoutTemplate size={22} strokeWidth={1.75} />,
-      title: '50+ Templates',
+      title: `${templates.length} Templates`,
       description: 'Pick a professional layout and customise the colours to suit your field.',
     },
     {

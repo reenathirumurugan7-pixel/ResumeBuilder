@@ -13,9 +13,11 @@ dist-ssr
 *.local
 
 # Env files
-.env
-.env.local
-.env.*.local
+.env*
+!.env.example
+
+# Firebase CLI local state
+.firebase/
 
 # Service-account and other credential material. The app itself never needs any
 # of these (it uses the browser Firebase SDK and verifies ID tokens with Google's

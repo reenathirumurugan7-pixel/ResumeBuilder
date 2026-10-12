@@ -14,9 +14,11 @@ const API_BASE = '/api/ai'
 const REQUEST_TIMEOUT_MS = 40000
 const MAX_TEXT_LENGTH = 20000
 
-function parseError(message, code, status) {
-  const err = new Error(message)
+function parseError(message, code, cause, status) {
+  const err = new Error(message, cause ? { cause } : undefined)
   err.code = code
+  // The HTTP status lets callers tell a rate limit (429) apart from an
+  // unavailable or misconfigured endpoint without matching on wording.
   if (status) err.status = status
   return err
 }

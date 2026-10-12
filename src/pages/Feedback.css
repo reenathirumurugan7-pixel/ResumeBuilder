@@ -121,6 +121,47 @@
   font-weight: 500;
 }
 
+/* Same box, danger palette. Reuses the tokens index.css already redefines for
+   the dark theme, so the error state stays legible in both themes without a
+   second set of hard-coded colours. */
+.feedback-notice-error {
+  background: var(--danger-light);
+  border-color: var(--danger-border);
+  color: var(--danger-hover);
+}
+
+.feedback-notice-icon {
+  flex-shrink: 0;
+}
+
+.feedback-optional {
+  font-weight: 500;
+  color: var(--text-muted, var(--placeholder, #94A3B8));
+}
+
+.feedback-count {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted, var(--placeholder, #94A3B8));
+  font-variant-numeric: tabular-nums;
+}
+
+.feedback-count-over {
+  color: var(--danger-hover);
+  font-weight: 600;
+}
+
+.feedback-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.feedback-input:disabled,
+.feedback-textarea:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .feedback-page {
     padding: 96px 20px 48px;

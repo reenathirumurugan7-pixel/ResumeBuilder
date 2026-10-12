@@ -523,7 +523,7 @@ export default function LiveResumePreview({ config, data, resumeType, className 
   const headerConfig = { ...resolved, qrEnabled: !!qrUrl }
 
   return (
-    <div className={`lrp-page ${className}`} style={{ background: colors.background, padding: spacing.margin }}>
+    <div className={`lrp-page ${className}`} data-resume-preview="true" style={{ background: colors.background, padding: spacing.margin }}>
       {qrUrl && (
         <div className="lrp-qr-corner">
           <ResumeQRCode url={qrUrl} size={72} compact />

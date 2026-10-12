@@ -93,7 +93,10 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
   const handleDocx = () => {
     run('docx', async () => {
       const { generateWord } = await import('../utils/wordExport')
-      const file = await generateWord(resume.formData, type, resume.config || null)
+      const file = await generateWord(resume.formData, type, resume.config || null, {
+        qrCodeEnabled: resume.qrCodeEnabled === true,
+        resumeId: resume.id,
+      })
       const counted = await recordResumeDownload(resume.id)
       if (counted) onDownloadRecorded(resume.id)
       onMessage(`Word document downloaded: ${file}`, 'success')

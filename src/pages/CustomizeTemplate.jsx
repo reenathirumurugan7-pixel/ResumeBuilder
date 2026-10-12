@@ -170,7 +170,9 @@ function CustomizeTemplate() {
           </div>
         </div>
         <div className="container customize-sticky-actions">
-          <button className="btn btn-secondary btn-sm" onClick={handleReset}>Reset</button>
+          {/* Reset is destructive, so it opens the confirmation first; handleReset
+              only runs once the user confirms in that modal. */}
+          <button className="btn btn-secondary btn-sm" onClick={() => setConfirmReset(true)}>Reset</button>
           <button className="btn btn-secondary btn-sm" onClick={handleSave}>Save Template</button>
           <button className="btn btn-secondary btn-sm" onClick={handleDuplicate}>Duplicate</button>
           <button className="btn btn-primary btn-sm" onClick={handleUse}>Use Template</button>

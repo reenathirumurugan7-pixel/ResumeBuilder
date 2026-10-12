@@ -1,6 +1,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // An admin is any authenticated user whose verified ID token carries the
+    // `admin: true` custom claim. Claims are only ever set by a trusted Admin SDK
+    // process (scripts/set-admin.js / the admin API), are signed into the token,
+    // and therefore cannot be fabricated by a client. The rule is kept at this
+    // scope so every collection below can use it.
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
     match /resumes/{resumeId} {
 
       function isOwner() {
@@ -8,9 +18,11 @@ service cloud.firestore {
       }
 
       // Public resumes can be read by anyone (unauthenticated or authenticated).
-      // Private resumes can only be read by the authenticated owner.
+      // Private resumes can only be read by the authenticated owner. Admins can
+      // read any resume for moderation and analytics.
       allow read: if resource.data.isPublic == true
-                  || isOwner();
+                  || isOwner()
+                  || isAdmin();
 
       // Only authenticated users can create resumes.
       // The creator must set userId to their own UID.
@@ -51,14 +63,101 @@ service cloud.firestore {
                           && request.resource.data.downloads >= 1
                           && request.resource.data.downloads == resource.data.get('downloads', 0) + 1);
 
-      // Only the owner can delete their own resume.
-      allow delete: if isOwner();
+      // Only the owner can delete their own resume. Admins may remove any resume
+      // when moderation warrants it; they cannot edit content, only delete.
+      allow delete: if isOwner() || isAdmin();
+
+      // Saved snapshots of this resume (Resume Version History).
+      //
+      // A version is an immutable record: it may be created once, read and
+      // deleted by its owner (or an admin for moderation), but never updated —
+      // `allow update: if false` is what makes a stored snapshot trustworthy as
+      // "what the resume looked like then". Delete is allowed on purpose: users
+      // can clean up their own history, and a deleted version simply disappears
+      // from the list.
+      //
+      // Ownership is checked with get() against the parent resume instead of
+      // `resource.data`, because inside this match `resource` is the version
+      // document, not the resume. Rules are not hierarchical: without this
+      // explicit match the collection-wide deny below would block subcollections.
+      match /versions/{versionId} {
+        function isVersionOwner() {
+          return request.auth != null
+            && request.auth.uid == get(/databases/$(database)/documents/resumes/$(resumeId)).data.userId;
+        }
+
+        // Pins the shape of a stored version: the exact field set, a positive
+        // sequential number, a link back to its own resume, the caller's own uid,
+        // a known resume type, a server-set timestamp and a snapshot limited to
+        // resume data (form fields + template config) — never tokens, keys or
+        // credentials. `hasOnly` on the snapshot allows `config` to be absent.
+        function validVersion() {
+          let data = request.resource.data;
+          return data.keys().hasOnly(['versionNumber', 'resumeId', 'userId', 'resumeType', 'createdAt', 'snapshot'])
+            && data.versionNumber is int
+            && data.versionNumber > 0
+            && data.resumeId == resumeId
+            && data.userId == request.auth.uid
+            && data.resumeType in ['fresher', 'experienced']
+            && data.createdAt is timestamp
+            && data.snapshot is map
+            && data.snapshot.keys().hasOnly(['formData', 'qrCodeEnabled', 'config'])
+            && data.snapshot.formData is map;
+        }
+
+        // Version listings are owner-scoped queries, which is why the owner
+        // check may not depend on `resource.data`.
+        allow read: if isVersionOwner() || isAdmin();
+
+        allow create: if isVersionOwner() && validVersion();
+
+        allow update: if false;
+
+        allow delete: if isVersionOwner() || isAdmin();
+      }
 
       // Deny everything else on the resumes collection.
       allow read, write: if false;
     }
 
-    // Deny access to everything outside the `resumes` collection.
+    // Feedback submitted from the public /feedback page.
+    //
+    // This collection is write-only for everyone else. `read` stays denied for
+    // non-admin clients, so nothing — including this app's own code — can list or
+    // read a submission through the SDK as a regular user. That matters because a
+    // document here carries the submitter's Firebase uid; submissions are meant
+    // to be reviewed by an admin, not through a public endpoint. Admins may list
+    // and delete submissions (read-only moderation); update stays denied for
+    // everyone.
+    //
+    // Anyone may submit, signed in or not, so the only identity that can be
+    // attached is the caller's own: `userId` may be absent, or it must equal
+    // request.auth.uid. Feedback therefore cannot be filed under someone else's
+    // uid. `hasOnly` pins the field set, so a client cannot attach extra fields
+    // to a stored document.
+    match /feedback/{feedbackId} {
+      function validFeedback() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['message', 'name', 'userId', 'path', 'createdAt'])
+          && data.message is string
+          && data.message.size() >= 1
+          && data.message.size() <= 2000
+          && data.name is string
+          && data.name.size() <= 80
+          && data.path is string
+          && data.path.size() <= 100
+          && data.createdAt is int
+          && data.createdAt > 0
+          && (!("userId" in data)
+              || (data.userId is string && data.userId == request.auth.uid));
+      }
+
+      allow create: if validFeedback();
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
+    // Deny access to everything outside the `resumes` and `feedback` collections.
     match /{document=**} {
       allow read, write: if false;
     }

@@ -32,25 +32,8 @@ import { useTheme } from '../context/useTheme'
 import { useTemplate } from '../context/TemplateContext'
 import templates from '../data/templates'
 import { version as appVersion } from '../../package.json'
+import { SETTINGS_KEY, loadSettings } from '../config/settings'
 import './Settings.css'
-
-// Non-sensitive preferences only. Passwords, API keys and Firebase credentials
-// are never read, written or rendered here; the AI key lives on the server and
-// this page never touches it.
-const SETTINGS_KEY = 'resume_builder_settings'
-
-const DEFAULTS = {
-  defaultResumeType: 'fresher',
-  defaultTemplateId: '',
-  autoSave: true,
-  // Private is the safe default: a resume must never become public just because
-  // a preference was written.
-  defaultVisibility: 'private',
-  notifyResumeSave: true,
-  notifyAiEnhancement: true,
-  notifyProduct: false,
-  aiEnhancement: true,
-}
 
 const RESUME_TYPES = [
   { value: 'fresher', label: 'Fresher', description: 'Students and recent graduates.' },
@@ -93,29 +76,6 @@ function findLocalDraftKeys() {
     return []
   }
   return keys
-}
-
-function isOneOf(value, allowed, fallback) {
-  return allowed.includes(value) ? value : fallback
-}
-
-function loadSettings() {
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(SETTINGS_KEY) || '{}')
-    const stored = parsed && typeof parsed === 'object' ? parsed : {}
-    return {
-      defaultResumeType: isOneOf(stored.defaultResumeType, ['fresher', 'experienced'], DEFAULTS.defaultResumeType),
-      defaultTemplateId: typeof stored.defaultTemplateId === 'string' ? stored.defaultTemplateId : DEFAULTS.defaultTemplateId,
-      autoSave: typeof stored.autoSave === 'boolean' ? stored.autoSave : DEFAULTS.autoSave,
-      defaultVisibility: isOneOf(stored.defaultVisibility, ['private', 'public'], DEFAULTS.defaultVisibility),
-      notifyResumeSave: typeof stored.notifyResumeSave === 'boolean' ? stored.notifyResumeSave : DEFAULTS.notifyResumeSave,
-      notifyAiEnhancement: typeof stored.notifyAiEnhancement === 'boolean' ? stored.notifyAiEnhancement : DEFAULTS.notifyAiEnhancement,
-      notifyProduct: typeof stored.notifyProduct === 'boolean' ? stored.notifyProduct : DEFAULTS.notifyProduct,
-      aiEnhancement: typeof stored.aiEnhancement === 'boolean' ? stored.aiEnhancement : DEFAULTS.aiEnhancement,
-    }
-  } catch {
-    return { ...DEFAULTS }
-  }
 }
 
 const SECTIONS = [
@@ -558,10 +518,9 @@ function Settings() {
               <SwitchRow
                 id="settings-auto-save"
                 title="Enable automatic saving"
-                description="Editors already save your progress as you type. This preference is stored for you and does not change the saving behaviour."
+                description="Automatically save your changes as you type in the editors. Turn this off to save only when you press “Save Resume”."
                 checked={settings.autoSave}
                 onChange={(value) => update('autoSave', value)}
-                badge="Preference only"
               />
             </SettingsSection>
 
@@ -574,8 +533,8 @@ function Settings() {
                 onChange={(value) => update('defaultVisibility', value)}
               />
               <p className="settings-footnote">
-                New resumes are always created private. Changing visibility for a resume that already exists is
-                done from the Resume Vault, and this preference does not change any saved resume.
+                New resumes are created with your chosen default visibility. Changing visibility for a resume that already
+                exists is done from the Resume Vault, and this preference never changes a saved resume.
               </p>
 
               <div className="settings-callout">

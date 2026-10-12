@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   FileText,
@@ -9,6 +9,7 @@ import {
   FolderLock,
   Info,
   LayoutDashboard,
+  LogIn,
   LogOut,
   MessageSquare,
   Monitor,
@@ -18,6 +19,8 @@ import {
 } from 'lucide-react'
 import { useTheme } from '../context/useTheme'
 import { useAuth } from '../context/AuthContext'
+import { useIsAdmin } from '../hooks/useIsAdmin'
+import templates from '../data/templates'
 import './Hero.css'
 
 const themeOptions = [
@@ -76,31 +79,50 @@ const heroFeatures = [
   'Live Preview',
 ]
 
-const baseNavLinks = [
+// The template count is read from the catalogue rather than typed in, so it
+// cannot drift from src/data/templates.js when a template is added or removed.
+// These three are product facts, not usage statistics: this project records no
+// number of resumes built or users, so the row deliberately avoids claiming any.
+const heroStats = [
+  { value: String(templates.length), label: 'Templates' },
+  { value: 'ATS', label: 'Scoring & Job Matching' },
+  { value: 'Free', label: 'No Sign-Up Required' },
+]
+
+const dashboardTiles = [
   { label: 'Home', path: '/', icon: HomeIcon },
-  { label: 'Templates', path: '/templates', icon: LayoutTemplate },
-  { label: 'Resume Vault', path: '/resume-vault', icon: FolderLock },
   { label: 'Features', path: '/features', icon: Sparkles },
   { label: 'About', path: '/about', icon: Info },
+  { label: 'Login', path: '/login', icon: LogIn },
+  { label: 'Logout', action: 'logout', icon: LogOut },
   { label: 'Feedback', path: '/feedback', icon: MessageSquare },
+  { label: 'Templates', path: '/templates', icon: LayoutTemplate },
+  { label: 'Resume Vault', path: '/resume-vault', icon: FolderLock },
+  {
+    label: 'Settings',
+    path: '/settings',
+    icon: SettingsIcon,
+    description: 'Manage your ResumeBuilder preferences.',
+  },
 ]
 
 function Hero() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+  const { isAdmin } = useIsAdmin()
 
-  // Dashboard and Settings are signed-in only: both sit behind ProtectedRoute,
-  // so they belong with the account items below the public links. Without the
-  // Dashboard entry the panel was the only nav on the page and a signed-in user
-  // had no route to their own dashboard.
-  const navLinks = user
-    ? [
-        ...baseNavLinks,
-        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { label: 'Settings', path: '/settings', icon: SettingsIcon },
-      ]
-    : baseNavLinks
+  const welcomeName = user?.displayName || user?.email || 'Guest'
+
+  const quickAccessTiles = [
+    ...dashboardTiles,
+    {
+      label: 'Dashboard',
+      path: isAdmin ? '/admin' : '/dashboard',
+      icon: LayoutDashboard,
+      description: 'View resume activity.',
+    },
+  ]
 
   const handleLogout = async () => {
     await logout()
@@ -121,7 +143,7 @@ function Hero() {
 
           <div className="hero-badge">
             <span className="badge-dot"></span>
-            Trusted by 10,000+ students &amp; professionals
+            Built for students, freshers &amp; professionals
           </div>
 
           <h1 className="hero-heading">
@@ -157,66 +179,81 @@ function Hero() {
           </div>
 
           <div className="hero-stats">
-            <div className="stat-item">
-              <span className="stat-number">50+</span>
-              <span className="stat-label">Templates</span>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-item">
-              <span className="stat-number">10K+</span>
-              <span className="stat-label">Resumes Created</span>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-item">
-              <span className="stat-number">95%</span>
-              <span className="stat-label">ATS Score</span>
-            </div>
+            {heroStats.map((stat) => (
+              <Fragment key={stat.label}>
+                <div className="stat-item">
+                  <span className="stat-number">{stat.value}</span>
+                  <span className="stat-label">{stat.label}</span>
+                </div>
+                <div className="stat-divider"></div>
+              </Fragment>
+            ))}
           </div>
         </div>
 
-        <nav className="hero-nav" aria-label="Main navigation">
-          {!user && (
-            <Link to="/login" className="hero-nav-login">
-              Login
-            </Link>
-          )}
-
-          <ul className="hero-nav-list">
-            {navLinks.map(({ label, path, icon: Icon }) => (
-              <li key={path}>
-                <Link
-                  to={path}
-                  className={`hero-nav-link ${location.pathname === path ? 'active' : ''}`}
-                >
-                  <span className="hero-nav-icon">
-                    <Icon size={17} />
-                  </span>
-                  <span className="hero-nav-label">{label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {user && (
-            <div className="hero-nav-user" title={user.email || user.displayName || 'Signed in'}>
-              <span className="hero-nav-avatar">
-                {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
-              </span>
-              <span className="hero-nav-user-name">
-                {user.displayName || user.email || 'Account'}
-              </span>
+        <section className="hero-dashboard" aria-labelledby="home-quick-access-title">
+          <div className="home-dash-card">
+            <div className="home-dash-header">
+              <h2 className="home-dash-title" id="home-quick-access-title">
+                Quick Access
+              </h2>
+              <p className="home-dash-welcome">Welcome, {welcomeName}</p>
             </div>
-          )}
 
-          {user && (
-            <button type="button" className="hero-nav-logout" onClick={handleLogout}>
-              <LogOut size={17} />
-              <span>Logout</span>
-            </button>
-          )}
+            <ul className="home-dash-grid">
+              {quickAccessTiles.map(({ label, path, action, description, icon: Icon }) => {
+                const content = (
+                  <>
+                    <span className="home-dash-tile-icon">
+                      <Icon size={24} strokeWidth={1.75} />
+                    </span>
+                    <span className="home-dash-tile-label">{label}</span>
+                  </>
+                )
 
-          <ThemeSwitcher />
-        </nav>
+                if (action === 'logout') {
+                  return (
+                    <li key={label}>
+                      <button type="button" className="home-dash-tile" onClick={handleLogout}>
+                        {content}
+                      </button>
+                    </li>
+                  )
+                }
+
+                const active = location.pathname === path
+                return (
+                  <li key={label}>
+                    <Link
+                      to={path}
+                      className={`home-dash-tile ${active ? 'active' : ''}`}
+                      aria-current={active ? 'page' : undefined}
+                      title={description || undefined}
+                    >
+                      {content}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+
+            <div className="home-dash-footer">
+              <ThemeSwitcher />
+              {user && (
+                <div className="home-dash-footer-links">
+                  <Link to={isAdmin ? '/admin' : '/dashboard'} className="home-dash-footer-link">
+                    <LayoutDashboard size={15} />
+                    Dashboard
+                  </Link>
+                  <Link to="/settings" className="home-dash-footer-link">
+                    <SettingsIcon size={15} />
+                    Settings
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   )

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Eye, Download, CheckCircle, XCircle, AlignLeft } from 'lucide-react'
+import { ArrowLeft, Download, CheckCircle, XCircle, AlignLeft, Printer } from 'lucide-react'
 import PersonalInfo from '../components/PersonalInfo'
 import Education from '../components/Education'
 import Skills from '../components/Skills'
@@ -14,11 +14,16 @@ import AiAssistant from '../components/AiAssistant'
 import AiSuggestions from '../components/AiSuggestions'
 import { useTemplate } from '../context/TemplateContext'
 import templates from '../data/templates'
-import LiveResumePreview from '../components/LiveResumePreview'
+import ResumePreviewPanel from '../components/ResumePreviewPanel'
+import ResumeCompleteness from '../components/ResumeCompleteness'
 import AtsScorePanel from '../components/AtsScorePanel'
+import { VersionControls } from '../components/VersionHistory'
+import { sanitizeVersionSnapshot } from '../services/resumeVersions'
 import { useAuth } from '../context/AuthContext'
 import { firebaseConfigured } from '../firebase'
 import { getResume, getResumeFromFirestore, initResume, claimGuestDrafts, recordResumeDownload, resolveFreshestResume, saveResume, saveResumeToFirestore } from '../utils/resumeStorage'
+import { defaultTemplateConfig, defaultVisibilityIsPublic, isAutoSaveEnabled } from '../config/settings'
+import { printResume } from '../utils/printResume'
 import './Editor.css'
 
 // Typing must not produce one Firestore write per keystroke, so the cloud write
@@ -47,8 +52,9 @@ const initialData = {
 function FresherEditor() {
   const { selectedConfig } = useTemplate()
   const { user } = useAuth()
+  const autoSaveEnabled = isAutoSaveEnabled()
   const [init] = useState(() =>
-    initResume({ storedKey: 'fresher_resume_id', resumeType: 'fresher', defaultData: initialData, config: selectedConfig }),
+    initResume({ storedKey: 'fresher_resume_id', resumeType: 'fresher', defaultData: initialData, config: selectedConfig || defaultTemplateConfig() }),
   )
   const [resumeId] = useState(init.id)
   const [formData, setFormData] = useState(init.formData)
@@ -73,9 +79,11 @@ function FresherEditor() {
   const seedVisibility = useRef(init.isNew === true)
 
   // Local draft is written synchronously on every change (cheap, offline-safe);
-  // the cloud copy is debounced and only sent while signed in.
+  // the cloud copy is debounced and only sent while signed in. Auto Save off
+  // disables this effect entirely; saving then happens on manual saves only.
   useEffect(() => {
     if (!hydrated) return undefined
+    if (!autoSaveEnabled) return undefined
     const payload = { formData, qrCodeEnabled, resumeType: 'fresher', config: activeConfig }
     saveResume(resumeId, payload)
     if (!userId || !firebaseConfigured) return undefined
@@ -84,10 +92,13 @@ function FresherEditor() {
     cloudTimer.current = setTimeout(() => {
       setSaveStatus('saving')
       const isNewResume = seedVisibility.current
-      saveResumeToFirestore(resumeId, payload, { isNewResume })
+      // Only a resume that has never reached Firestore gets its visibility
+      // seeded (from Settings); every later save leaves visibility untouched.
+      const seedWrite = isNewResume ? { isPublic: defaultVisibilityIsPublic() } : {}
+      saveResumeToFirestore(resumeId, { ...payload, ...seedWrite }, { isNewResume })
         .then((written) => {
           // Only stop seeding visibility once a write actually landed, so a
-          // resume started anonymously still goes public on its first real save.
+          // resume started anonymously still gets its seed on the first real save.
           if (written) {
             seedVisibility.current = false
             setSaveStatus('saved')
@@ -103,7 +114,7 @@ function FresherEditor() {
     return () => {
       if (cloudTimer.current) clearTimeout(cloudTimer.current)
     }
-  }, [formData, qrCodeEnabled, resumeId, activeConfig, userId, hydrated])
+  }, [formData, qrCodeEnabled, resumeId, activeConfig, userId, hydrated, autoSaveEnabled])
 
   // Resolve the newest copy on boot: a resume edited on another device is newer
   // than this browser's local draft.
@@ -130,6 +141,7 @@ function FresherEditor() {
         if (source === 'cloud') {
           setSaveMsg({ type: 'success', text: 'Loaded the newer version saved on your other device.' })
         }
+        seedVisibility.current = false
         setHydrated(true)
       })
       .catch(() => setHydrated(true))
@@ -247,7 +259,13 @@ function FresherEditor() {
       // view counter seeded; every other save leaves both untouched.
       await saveResumeToFirestore(
         resumeId,
-        { formData, qrCodeEnabled, resumeType: 'fresher', config: activeConfig, isPublic: true },
+        {
+          formData,
+          qrCodeEnabled,
+          resumeType: 'fresher',
+          config: activeConfig,
+          ...(existing ? {} : { isPublic: defaultVisibilityIsPublic() }),
+        },
         { isNewResume: !existing },
       )
       seedVisibility.current = false
@@ -262,6 +280,29 @@ function FresherEditor() {
       setSaveStatus('idle')
       setSaveMsg({ type: 'error', text: 'Failed to save resume. Please try again.' })
     }
+  }
+
+  // Applies a saved version snapshot to the editor. Data is replaced first,
+  // validation state is cleared, and the restored values are written straight
+  // to the local draft — cloud sync then follows the normal autosave/manual
+  // save path, so restoring is not itself a version-creating action.
+  const handleRestoreVersion = async (snapshot) => {
+    const clean = sanitizeVersionSnapshot(snapshot)
+    if (!clean) {
+      throw new Error('This version could not be restored because its saved data is missing.')
+    }
+    setFormData(clean.formData)
+    setQrCodeEnabled(clean.qrCodeEnabled)
+    setActiveConfig((prev) => clean.config || prev)
+    setErrors({})
+    setSubmitted(false)
+    setSaveMsg(null)
+    saveResume(resumeId, {
+      formData: clean.formData,
+      qrCodeEnabled: clean.qrCodeEnabled,
+      resumeType: 'fresher',
+      config: clean.config,
+    })
   }
 
   const updatePersonalInfo = (data) => {
@@ -409,14 +450,23 @@ function FresherEditor() {
               <p className="autosave-hint">
                 {!userId
                   ? 'Signed out — changes are kept in this browser only.'
-                  : saveStatus === 'error'
-                    ? 'Cloud autosave failed. Use “Save Resume” to retry.'
-                    : saveStatus === 'saving'
-                      ? 'Saving to your account…'
-                      : hydrated
-                        ? 'All changes are saved to your account.'
-                        : 'Loading your resume…'}
+                  : !autoSaveEnabled
+                    ? 'Auto save is off — press “Save Resume” to save changes.'
+                    : saveStatus === 'error'
+                      ? 'Cloud autosave failed. Use “Save Resume” to retry.'
+                      : saveStatus === 'saving'
+                        ? 'Saving to your account…'
+                        : hydrated
+                          ? 'All changes are saved to your account.'
+                          : 'Loading your resume…'}
               </p>
+              <VersionControls
+                resumeId={resumeId}
+                resumeType="fresher"
+                currentSnapshot={{ formData, qrCodeEnabled, config: activeConfig }}
+                onRestore={handleRestoreVersion}
+                disabled={!hydrated || downloading}
+              />
               <div className="editor-actions">
                 <button type="submit" className="btn btn-primary submit-btn" disabled={downloading || saveStatus === 'saving'}>
                   {downloading ? (
@@ -430,6 +480,15 @@ function FresherEditor() {
                       Download
                     </>
                   )}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => printResume(formData, 'fresher')}
+                  disabled={downloading || saveStatus === 'saving'}
+                >
+                  <Printer size={18} />
+                  Print
                 </button>
                 <button
                   type="button"
@@ -456,28 +515,16 @@ function FresherEditor() {
           </form>
         </div>
 
-        <div className="editor-preview-panel">
-          <div className="editor-preview-sticky">
-            <div className="editor-preview-head">
-              <h3 className="editor-preview-title">
-                <Eye size={16} />
-                Live Resume Preview
-              </h3>
-            </div>
-            {previewConfig ? (
-              <div className="editor-preview-scaler">
-                <LiveResumePreview config={previewConfig} data={formData} resumeType="fresher" qrCodeEnabled={qrCodeEnabled} resumeId={resumeId} />
-              </div>
-            ) : (
-              <div className="editor-preview-empty">
-                <p>No template selected.</p>
-                <Link className="btn btn-secondary btn-sm" to="/templates">Choose a Template</Link>
-              </div>
-            )}
-
-            <AtsScorePanel data={formData} resumeType="fresher" />
-          </div>
-        </div>
+        <ResumePreviewPanel
+          config={previewConfig}
+          data={formData}
+          resumeType="fresher"
+          qrCodeEnabled={qrCodeEnabled}
+          resumeId={resumeId}
+        >
+          <ResumeCompleteness data={formData} resumeType="fresher" />
+          <AtsScorePanel data={formData} resumeType="fresher" />
+        </ResumePreviewPanel>
       </div>
     </div>
   )

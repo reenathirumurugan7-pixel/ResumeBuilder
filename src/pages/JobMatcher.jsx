@@ -142,6 +142,16 @@ function JobMatcher() {
         if (stored.jobDescription) setJobDescription(stored.jobDescription)
         if (stored.resumeId && docs.some((r) => r.id === stored.resumeId)) {
           setSelectedId(stored.resumeId)
+        } else {
+          // No persisted or still-existing selection: default to the most
+          // recently updated resume so a first visit still compares the resume
+          // the user is most likely working on.
+          const mostRecent = [...docs].sort((a, b) => {
+            const ta = Date.parse(a.updatedAt || a.createdAt || 0)
+            const tb = Date.parse(b.updatedAt || b.createdAt || 0)
+            return (Number.isFinite(tb) ? tb : 0) - (Number.isFinite(ta) ? ta : 0)
+          })[0]
+          if (mostRecent) setSelectedId(mostRecent.id)
         }
       })
       .catch(() => {
@@ -463,7 +473,7 @@ function JobMatcher() {
                       ) : (
                         <>
                           <Target size={16} />
-                          Analyze Job
+                          Analyze Job Match
                         </>
                       )}
                     </button>

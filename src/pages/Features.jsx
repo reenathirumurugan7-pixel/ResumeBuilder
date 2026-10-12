@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { FileText, LayoutGrid, Eye, Star, Download, CheckCircle, Save, Shield, Info, X } from 'lucide-react'
 import ScrollReveal from '../components/ScrollReveal'
 import { getAllResumes, getResumeInProgress } from '../utils/resumeStorage'
+import { loadSettings } from '../config/settings'
 import './Features.css'
 
 function Features() {
@@ -14,7 +15,8 @@ function Features() {
     // Namespaced lookup so this reflects the current account's own draft.
     const inProgress = getResumeInProgress()
     if (inProgress) return inProgress.resumeType === 'experienced' ? 'experienced' : 'fresher'
-    return 'fresher'
+    // No in-progress resume: start a new one with the Settings default type.
+    return loadSettings().defaultResumeType
   }, [])
 
   const hasResumes = useCallback(() => {
