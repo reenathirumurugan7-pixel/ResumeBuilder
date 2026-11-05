@@ -1,6 +1,7 @@
 import { Briefcase, Trash2, Plus } from 'lucide-react'
 import AiAssistant from './AiAssistant'
 import './WorkExperience.css'
+import { capitalizeInputValue } from '../utils/capitalize'
 
 function WorkExperience({ entries, onChange }) {
   const addEntry = () => {
@@ -24,6 +25,10 @@ function WorkExperience({ entries, onChange }) {
 
   const handleChange = (id, field, value) => {
     onChange(entries.map((e) => (e.id === id ? { ...e, [field]: value } : e)))
+  }
+
+  const handleTextChange = (id, field, event) => {
+    handleChange(id, field, capitalizeInputValue(event))
   }
 
   return (
@@ -55,7 +60,7 @@ function WorkExperience({ entries, onChange }) {
                 className="form-input"
                 placeholder="Google"
                 value={entry.company}
-                onChange={(e) => handleChange(entry.id, 'company', e.target.value)}
+                onChange={(e) => handleTextChange(entry.id, 'company', e)}
               />
             </div>
             <div className="form-group">
@@ -65,7 +70,7 @@ function WorkExperience({ entries, onChange }) {
                 className="form-input"
                 placeholder="Software Engineer"
                 value={entry.jobTitle}
-                onChange={(e) => handleChange(entry.id, 'jobTitle', e.target.value)}
+                onChange={(e) => handleTextChange(entry.id, 'jobTitle', e)}
               />
             </div>
           </div>
@@ -77,7 +82,7 @@ function WorkExperience({ entries, onChange }) {
               className="form-input"
               placeholder="San Francisco, CA"
               value={entry.location}
-              onChange={(e) => handleChange(entry.id, 'location', e.target.value)}
+              onChange={(e) => handleTextChange(entry.id, 'location', e)}
             />
           </div>
 

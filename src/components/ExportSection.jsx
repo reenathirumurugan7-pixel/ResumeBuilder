@@ -17,7 +17,7 @@ function ExportSection({ formData, resumeType }) {
   const handleExportPDF = async () => {
     setLoading('pdf')
     try {
-      const fileName = generatePDF(formData, resumeType)
+      const fileName = await generatePDF(formData, resumeType)
       showNotification(`PDF exported: ${fileName}`, 'success')
     } catch {
       showNotification('Failed to generate PDF. Please try again.', 'error')
@@ -50,10 +50,10 @@ function ExportSection({ formData, resumeType }) {
     }
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     setLoading('download')
     try {
-      const fileName = generatePDF(formData, resumeType)
+      const fileName = await generatePDF(formData, resumeType)
       showNotification(`Downloaded: ${fileName}`, 'success')
     } catch {
       showNotification('Failed to download. Please try again.', 'error')

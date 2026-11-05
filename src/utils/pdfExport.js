@@ -57,30 +57,49 @@ async function renderPreviewToPdf(source, fileName) {
   pdf.save(fileName)
 }
 
-export function generatePDF(formData, resumeType, configOrId = null, options = {}) {
+// Resolves the exact preview element to export. When a caller supplies a root
+// (the card / editor panel that owns the click), the search is confined to it so
+// a page with several previews — e.g. the Resume Vault or an open version modal —
+// can never export a different resume. A supplied root that contains no preview
+// resolves to null rather than falling through to the rest of the document.
+function resolvePreviewElement(options) {
+  const hasRoot = options != null && 'root' in options
+  const root = hasRoot ? options.root : null
+
+  if (root instanceof Element) {
+    return root.matches(PREVIEW_SELECTOR) ? root : root.querySelector(PREVIEW_SELECTOR)
+  }
+
+  // A root was explicitly supplied but is not an element (e.g. a ref that has
+  // not attached yet); refuse rather than guess at another resume's preview.
+  if (hasRoot) return null
+
+  return document.querySelector(PREVIEW_SELECTOR)
+}
+
+export async function generatePDF(formData, resumeType, configOrId = null, options = {}) {
   // These arguments are kept so FresherEditor / ExperiencedEditor keep calling
-  // this function unchanged; the live preview already reflects them.
+  // this function unchanged; the live preview already reflects them (the QR code
+  // included, because it is rendered into the preview element that gets captured).
   void resumeType
   void configOrId
-  void options
 
   const pi = (formData && formData.personalInfo) || {}
   const fileName = `${(pi.fullName || 'resume').replace(/\s+/g, '_')}_Resume.pdf`
 
-  const source = document.querySelector(PREVIEW_SELECTOR)
+  const source = resolvePreviewElement(options)
   if (!source) {
-    // Never silently fall back to the old hand-built document.
-    window.alert('We could not find your resume preview to export. Please reopen the editor and try again.')
-    return null
+    // Never silently fall back to the old hand-built document, and never export
+    // another resume's preview that happens to be elsewhere on the page.
+    throw new Error('Resume preview not found; cannot export PDF.')
   }
 
-  // jsPDF's HTML pipeline is asynchronous but callers expect the filename
-  // synchronously, so the download is produced in the background and any
-  // failure is surfaced to the user instead of being swallowed.
-  renderPreviewToPdf(source, fileName).catch((error) => {
-    console.error('PDF export failed', error)
-    window.alert('Sorry, we could not generate your PDF. Please try again.')
-  })
+  // jsPDF's HTML pipeline is asynchronous, so the returned promise is settled
+  // only once the file has actually been handed to the browser. Callers await
+  // this before counting a download, which keeps the counter from incrementing
+  // while generation is still running — or after a failed export. A failure
+  // rejects here and is surfaced by the caller instead of being swallowed.
+  await renderPreviewToPdf(source, fileName)
 
   return fileName
 }

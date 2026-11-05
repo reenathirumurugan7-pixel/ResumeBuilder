@@ -164,6 +164,74 @@ function saveAll(resumes) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Deletion tombstones
+//
+// A deleted resume must not be revived by an editor that still holds its id
+// (for example a second tab). The tombstone is namespaced per account, exactly
+// like the drafts, and is checked before every local or cloud write. It only
+// records ids, never resume content, and a genuinely new resume gets a fresh
+// random id, so it can never be blocked by another resume's tombstone.
+// ---------------------------------------------------------------------------
+
+const DELETED_RESUMES_KEY = 'resume_builder_deleted_resumes'
+
+function deletedResumesKey(uid) {
+  return `${DELETED_RESUMES_KEY}_${uid || 'guest'}`
+}
+
+function readDeletedResumeIds() {
+  try {
+    const raw = localStorage.getItem(deletedResumesKey(currentUid()))
+    const parsed = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed)
+      ? parsed.filter((id) => typeof id === 'string' && id)
+      : []
+  } catch {
+    return []
+  }
+}
+
+function writeDeletedResumeIds(ids) {
+  try {
+    localStorage.setItem(deletedResumesKey(currentUid()), JSON.stringify(ids))
+  } catch {
+    /* storage unavailable — the in-memory write guard still cannot help */
+  }
+}
+
+export function isResumeDeleted(id) {
+  if (!id) return false
+  return readDeletedResumeIds().includes(id)
+}
+
+function markResumeDeleted(id) {
+  if (!id) return
+  const ids = readDeletedResumeIds()
+  if (!ids.includes(id)) writeDeletedResumeIds([...ids, id])
+}
+
+function unmarkResumeDeleted(id) {
+  if (!id) return
+  const ids = readDeletedResumeIds()
+  if (ids.includes(id)) writeDeletedResumeIds(ids.filter((value) => value !== id))
+}
+
+// Removes one resume's local draft and clears only the editor pointers that
+// still reference it. The helpers stay UID-scoped, so another account's drafts
+// and pointers are never touched.
+function forgetResumeLocally(id) {
+  deleteResume(id)
+  for (const storedKey of EDITOR_RESUME_KEYS) {
+    try {
+      const key = legacyIdKey(storedKey, currentUid())
+      if (localStorage.getItem(key) === id) localStorage.removeItem(key)
+    } catch {
+      /* storage unavailable */
+    }
+  }
+}
+
 /**
  * Moves drafts created while signed out (and any pre-namespacing drafts, which
  * `quarantineLegacyData` set aside) into the signed-in account's bucket.
@@ -242,24 +310,31 @@ export function initResume({ storedKey, resumeType, defaultData, config = null }
   try {
     const storedId = localStorage.getItem(scopedIdKey)
     if (storedId) {
-      const stored = getResume(storedId)
-      if (stored) {
-        return {
-          id: stored.id,
-          formData: stored.formData || defaultData,
-          qrCodeEnabled: !!stored.qrCodeEnabled,
-          config: stored.config || null,
-          isNew: false,
-          pendingFirestore: false,
+      if (isResumeDeleted(storedId)) {
+        // The resume was deleted after this pointer was written. Drop the stale
+        // pointer and fall through to a genuinely new resume instead of
+        // reviving the deleted id.
+        localStorage.removeItem(scopedIdKey)
+      } else {
+        const stored = getResume(storedId)
+        if (stored) {
+          return {
+            id: stored.id,
+            formData: stored.formData || defaultData,
+            qrCodeEnabled: !!stored.qrCodeEnabled,
+            config: stored.config || null,
+            isNew: false,
+            pendingFirestore: false,
+          }
         }
-      }
-      return {
-        id: storedId,
-        formData: defaultData,
-        qrCodeEnabled: false,
-        config: null,
-        isNew: false,
-        pendingFirestore: true,
+        return {
+          id: storedId,
+          formData: defaultData,
+          qrCodeEnabled: false,
+          config: null,
+          isNew: false,
+          pendingFirestore: true,
+        }
       }
     }
   } catch {
@@ -282,6 +357,7 @@ export function initResume({ storedKey, resumeType, defaultData, config = null }
 }
 
 export function saveResume(id, updates) {
+  if (isResumeDeleted(id)) return null
   const all = loadAll()
   const idx = all.findIndex((r) => r.id === id)
   const saved =
@@ -307,6 +383,7 @@ export function saveResume(id, updates) {
 }
 
 export function getResume(id) {
+  if (isResumeDeleted(id)) return null
   const all = loadAll()
   return all.find((r) => r.id === id) || null
 }
@@ -434,6 +511,11 @@ function isRulesDenied(err) {
  */
 export async function saveResumeToFirestore(id, data, { isNewResume = false } = {}) {
   if (!id) return null
+  if (isResumeDeleted(id)) {
+    const error = new Error('This resume was deleted and can no longer be saved.')
+    error.code = 'resume-deleted'
+    throw error
+  }
   if (!firebaseConfigured) {
     console.warn('Firebase not configured; resume not saved to Firestore.')
     return null
@@ -509,7 +591,7 @@ export async function saveResumeToFirestore(id, data, { isNewResume = false } = 
 }
 
 export async function getResumeFromFirestore(id) {
-  if (!id) return null
+  if (!id || isResumeDeleted(id)) return null
   if (!firebaseConfigured) {
     return null
   }
@@ -530,8 +612,25 @@ export async function getResumeFromFirestore(id) {
 }
 
 export async function deleteResumeFromFirestore(id) {
-  if (!id || !isCloudSyncEnabled()) return
-  await deleteDoc(firestoreDoc(id))
+  if (!id) return null
+  if (!isCloudSyncEnabled()) {
+    const error = new Error('You must be signed in to delete a resume.')
+    error.code = 'not-signed-in'
+    throw error
+  }
+  // Block writes from this tab and from other open tabs before the delete is
+  // sent, so a stale editor autosave cannot recreate the document.
+  markResumeDeleted(id)
+  try {
+    await deleteDoc(firestoreDoc(id))
+  } catch (err) {
+    // The document still exists, so allow saving again and let the caller
+    // report the real failure instead of a false success.
+    unmarkResumeDeleted(id)
+    throw err
+  }
+  forgetResumeLocally(id)
+  return true
 }
 
 // Writes the local draft (sync) and then persists to Firestore (async,

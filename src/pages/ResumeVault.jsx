@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Pencil, Eye, Download, FileText, QrCode, Link as LinkIcon, Copy, RefreshCw, Trash2, Search, X, Folder, GraduationCap, Briefcase, Globe, Lock } from 'lucide-react'
+import { Pencil, Eye, Download, FileText, QrCode, Link as LinkIcon, Copy, RefreshCw, Trash2, Search, X, Folder, GraduationCap, Briefcase, Globe, Lock, ExternalLink } from 'lucide-react'
 import { getUserResumesFromFirestore, deleteResumeFromFirestore, renameResumeInFirestore, duplicateResumeInFirestore, toggleResumeVisibility, recordResumeDownload, resumeUrl, resumeQrUrl, defaultResumeName, setEditorResumeId } from '../utils/resumeStorage'
 import { useAuth } from '../context/AuthContext'
 import { firebaseConfigured } from '../firebase'
@@ -59,7 +59,16 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
   const downloads = toCount(resume.downloads)
   const qrScans = toCount(resume.qrScans)
 
+  // The preview element belonging to this card only. Passing it as the export
+  // root means a PDF download can never capture another card's resume.
+  const previewRef = useRef(null)
+
   const toggleMenu = () => setMenuOpen((v) => !v)
+
+  const openResume = () => {
+    setEditorResumeId(type === 'experienced' ? 'experienced_resume_id' : 'fresher_resume_id', resume.id)
+    navigate(editPath)
+  }
 
   const run = async (key, fn) => {
     setBusy(key)
@@ -80,9 +89,12 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
   const handlePdf = () => {
     run('pdf', async () => {
       const { generatePDF } = await import('../utils/pdfExport')
-      const file = generatePDF(resume.formData, type, resume.config || null, {
+      // Await the export so the counter is only written after the file has been
+      // handed to the browser, never while generation is still running.
+      const file = await generatePDF(resume.formData, type, resume.config || null, {
         qrCodeEnabled: resume.qrCodeEnabled,
         resumeId: resume.id,
+        root: previewRef.current,
       })
       const counted = await recordResumeDownload(resume.id)
       if (counted) onDownloadRecorded(resume.id)
@@ -116,7 +128,7 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
 
   return (
     <div className="vault-card">
-      <div className="vault-card-preview">
+      <div className="vault-card-preview" ref={previewRef}>
         {configPreview ? (
           <div className="vault-preview-scaled">
             <div className="vault-preview-inner">
@@ -124,6 +136,8 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
                 config={configPreview}
                 data={resume.formData || {}}
                 resumeType={type}
+                qrCodeEnabled={resume.qrCodeEnabled === true}
+                resumeId={resume.id}
               />
             </div>
           </div>
@@ -154,13 +168,16 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
           </button>
           {menuOpen && (
             <div className="vault-menu">
-              <button className="vault-menu-item" onClick={() => { setEditorResumeId(type === 'experienced' ? 'experienced_resume_id' : 'fresher_resume_id', resume.id); navigate(editPath); }}>
+              <button className="vault-menu-item" onClick={openResume}>
+                <ExternalLink size={16} /> Open Resume
+              </button>
+              <button className="vault-menu-item" onClick={openResume}>
                 <Pencil size={16} /> Edit Resume
               </button>
               <button className="vault-menu-item" onClick={() => setShowQr(true)}>
                 <Eye size={16} /> Preview Resume
               </button>
-              <button className="vault-menu-item" onClick={handlePdf} disabled={busy === 'pdf'}>
+              <button className="vault-menu-item" onClick={handlePdf} disabled={busy === 'pdf' || !configPreview} title={!configPreview ? 'Choose a template before downloading a PDF' : undefined}>
                 <Download size={16} /> {busy === 'pdf' ? 'Generating...' : 'Download PDF'}
               </button>
               <button className="vault-menu-item" onClick={handleDocx} disabled={busy === 'docx'}>
@@ -209,13 +226,13 @@ function ResumeCard({ resume, onRename, onDelete, onDuplicate, onToggleVisibilit
         </div>
 
         <div className="vault-card-actions">
-          <button className="vault-action-btn vault-action-primary" onClick={() => { setEditorResumeId(type === 'experienced' ? 'experienced_resume_id' : 'fresher_resume_id', resume.id); navigate(editPath); }}>
+          <button className="vault-action-btn vault-action-primary" onClick={openResume}>
             <Pencil size={16} /> Edit
           </button>
           <button className="vault-action-btn" onClick={() => setShowQr(true)}>
             <Eye size={16} /> Preview
           </button>
-          <button className="vault-action-btn" onClick={handlePdf}>
+          <button className="vault-action-btn" onClick={handlePdf} disabled={!configPreview} title={!configPreview ? 'Choose a template before downloading a PDF' : undefined}>
             <Download size={16} /> PDF
           </button>
           <button className="vault-action-btn" onClick={() => { onMessage('', ''); setShowQr(true) }}>

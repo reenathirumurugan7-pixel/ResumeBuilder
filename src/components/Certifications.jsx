@@ -1,5 +1,6 @@
 import { Award, X, Plus } from 'lucide-react'
 import './Certifications.css'
+import { capitalizeInputValue } from '../utils/capitalize'
 
 function Certifications({ entries, onChange }) {
   const addEntry = () => {
@@ -33,7 +34,7 @@ function Certifications({ entries, onChange }) {
               className="form-input cert-input"
               placeholder="AWS Certified Cloud Practitioner"
               value={entry.name}
-              onChange={(e) => handleChange(entry.id, e.target.value)}
+              onChange={(e) => handleChange(entry.id, capitalizeInputValue(e))}
             />
             <button
               className="entry-remove"

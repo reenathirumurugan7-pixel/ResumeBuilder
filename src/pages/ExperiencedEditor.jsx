@@ -73,6 +73,9 @@ function ExperiencedEditor() {
   const [saveMsg, setSaveMsg] = useState(null)
   const saveTimer = useRef(null)
   const cloudTimer = useRef(null)
+  // The exact live-preview element this editor owns, so a PDF export is scoped
+  // to it and can never pick up another resume preview elsewhere in the document.
+  const previewRef = useRef(null)
   // Set when the global template differs from the resume's own template so the
   // next deliberate template choice is adopted instead of being ignored.
   const adoptTemplateChange = useRef(false)
@@ -140,9 +143,9 @@ function ExperiencedEditor() {
           })
         }
         if (source === 'cloud') {
+          seedVisibility.current = false
           setSaveMsg({ type: 'success', text: 'Loaded the newer version saved on your other device.' })
         }
-        seedVisibility.current = false
         setHydrated(true)
       })
       .catch(() => setHydrated(true))
@@ -222,9 +225,12 @@ function ExperiencedEditor() {
       // jsPDF is large and only needed on an actual download, so it is loaded on
       // demand rather than with the editor itself.
       const { generatePDF } = await import('../utils/pdfExport')
-      const fileName = generatePDF(formData, 'experienced', activeConfig, {
+      // Awaiting the export means the file has been handed to the browser
+      // before we report success or count the download.
+      const fileName = await generatePDF(formData, 'experienced', activeConfig, {
         qrCodeEnabled,
         resumeId,
+        root: previewRef.current,
       })
       setDownloadMsg({ type: 'success', text: `Downloaded: ${fileName}` })
       // Counted only after the PDF was actually produced, so a cancelled or
@@ -526,6 +532,7 @@ function ExperiencedEditor() {
           resumeType="experienced"
           qrCodeEnabled={qrCodeEnabled}
           resumeId={resumeId}
+          panelRef={previewRef}
         >
           <ResumeCompleteness data={formData} resumeType="experienced" />
           <AtsScorePanel data={formData} resumeType="experienced" />

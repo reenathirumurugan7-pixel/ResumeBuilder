@@ -1,6 +1,7 @@
 import { Folder, Trash2, Plus } from 'lucide-react'
 import AiAssistant from './AiAssistant'
 import './Projects.css'
+import { capitalizeInputValue } from '../utils/capitalize'
 
 function Projects({ entries, onChange }) {
   const addEntry = () => {
@@ -52,7 +53,7 @@ function Projects({ entries, onChange }) {
               className="form-input"
               placeholder="E-Commerce Platform"
               value={entry.title}
-              onChange={(e) => handleChange(entry.id, 'title', e.target.value)}
+              onChange={(e) => handleChange(entry.id, 'title', capitalizeInputValue(e))}
             />
           </div>
 

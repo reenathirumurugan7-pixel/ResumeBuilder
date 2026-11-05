@@ -2,14 +2,20 @@ import { useRef, useState } from 'react'
 import { User, Upload, Trash2 } from 'lucide-react'
 import './PersonalInfo.css'
 import { validatePhotoFile, normalizePhoto } from '../utils/photo'
+import { capitalizeInputValue } from '../utils/capitalize'
 
-function PersonalInfo({ data, onChange, errors, showPortfolio = false, onPhotoChange }) {
+const CAPITALIZED_FIELDS = new Set(['fullName', 'location'])
+
+function PersonalInfo({ data, onChange, errors, onPhotoChange }) {
   const fileInputRef = useRef(null)
   const [photoError, setPhotoError] = useState('')
   const [photoLoading, setPhotoLoading] = useState(false)
 
   const handleChange = (e) => {
-    onChange({ ...data, [e.target.name]: e.target.value })
+    const value = CAPITALIZED_FIELDS.has(e.target.name)
+      ? capitalizeInputValue(e)
+      : e.target.value
+    onChange({ ...data, [e.target.name]: value })
   }
 
   const handlePhotoSelect = async (e) => {
@@ -129,19 +135,18 @@ function PersonalInfo({ data, onChange, errors, showPortfolio = false, onPhotoCh
           />
         </div>
 
-        {showPortfolio && (
-          <div className="form-group form-group-full">
-            <label className="form-label">Portfolio URL</label>
-            <input
-              type="url"
-              name="portfolio"
-              className="form-input"
-              placeholder="https://yourportfolio.com"
-              value={data.portfolio || ''}
-              onChange={handleChange}
-            />
-          </div>
-        )}
+        <div className="form-group form-group-full">
+          <label className="form-label">Live Portfolio / Project URL</label>
+          <input
+            type="url"
+            name="portfolio"
+            className={`form-input ${errors.portfolio ? 'error' : ''}`}
+            placeholder="https://yourportfolio.com"
+            value={data.portfolio || ''}
+            onChange={handleChange}
+          />
+          {errors.portfolio && <span className="form-error">{errors.portfolio}</span>}
+        </div>
 
         <div className="form-group form-group-full">
           <label className="form-label">Profile Picture</label>

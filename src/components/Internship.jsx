@@ -1,6 +1,7 @@
 import { Briefcase, Trash2, Plus } from 'lucide-react'
 import AiAssistant from './AiAssistant'
 import './Internship.css'
+import { capitalizeInputValue } from '../utils/capitalize'
 
 function Internship({ entries, onChange }) {
   const addEntry = () => {
@@ -22,6 +23,10 @@ function Internship({ entries, onChange }) {
 
   const handleChange = (id, field, value) => {
     onChange(entries.map((e) => (e.id === id ? { ...e, [field]: value } : e)))
+  }
+
+  const handleTextChange = (id, field, event) => {
+    handleChange(id, field, capitalizeInputValue(event))
   }
 
   return (
@@ -53,7 +58,7 @@ function Internship({ entries, onChange }) {
                 className="form-input"
                 placeholder="Google / Microsoft"
                 value={entry.company}
-                onChange={(e) => handleChange(entry.id, 'company', e.target.value)}
+                onChange={(e) => handleTextChange(entry.id, 'company', e)}
               />
             </div>
             <div className="form-group">
@@ -63,7 +68,7 @@ function Internship({ entries, onChange }) {
                 className="form-input"
                 placeholder="Software Engineering Intern"
                 value={entry.role}
-                onChange={(e) => handleChange(entry.id, 'role', e.target.value)}
+                onChange={(e) => handleTextChange(entry.id, 'role', e)}
               />
             </div>
           </div>

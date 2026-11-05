@@ -1,5 +1,6 @@
 import { Star, X, Plus } from 'lucide-react'
 import './Achievements.css'
+import { capitalizeInputValue } from '../utils/capitalize'
 
 function Achievements({ entries, onChange }) {
   const addEntry = () => {
@@ -33,7 +34,7 @@ function Achievements({ entries, onChange }) {
               className="form-input achievement-input"
               placeholder="Won 1st place in hackathon..."
               value={entry.name}
-              onChange={(e) => handleChange(entry.id, e.target.value)}
+              onChange={(e) => handleChange(entry.id, capitalizeInputValue(e))}
             />
             <button
               className="entry-remove"

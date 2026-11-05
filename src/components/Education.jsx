@@ -1,5 +1,6 @@
 import { GraduationCap, Trash2, Plus } from 'lucide-react'
 import Typeahead from './Typeahead'
+import DepartmentSelect from './DepartmentSelect'
 import { colleges, universities } from '../data/institutions'
 import './Education.css'
 
@@ -25,31 +26,6 @@ const DEGREE_OPTIONS = [
   'M.Com',
   'B.A.',
   'M.A.',
-  'Other',
-]
-
-const DEPARTMENT_OPTIONS = [
-  'Computer Science',
-  'Computer Science and Engineering',
-  'Information Technology',
-  'Data Science',
-  'Data Analytics',
-  'Artificial Intelligence',
-  'Artificial Intelligence and Machine Learning',
-  'Software Engineering',
-  'Cyber Security',
-  'Cloud Computing',
-  'Electronics and Communication Engineering',
-  'Electrical and Electronics Engineering',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Biotechnology',
-  'Bioinformatics',
-  'Mathematics',
-  'Physics',
-  'Chemistry',
-  'Commerce',
-  'Business Administration',
   'Other',
 ]
 
@@ -153,15 +129,19 @@ function Education({ entries, onChange }) {
                 value={entry.degree}
                 onChange={(value) => handleChange(entry.id, 'degree', value)}
                 placeholder="Type or select degree..."
+                capitalize
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Department / Major</label>
-              <Typeahead
-                options={DEPARTMENT_OPTIONS}
+              <label className="form-label" htmlFor={`department-${entry.id}`}>
+                Department / Major
+              </label>
+              <DepartmentSelect
+                id={`department-${entry.id}`}
                 value={entry.department}
                 onChange={(value) => handleChange(entry.id, 'department', value)}
-                placeholder="Type or select department..."
+                placeholder="Search department, major, diploma or ITI trade..."
+                capitalize
               />
             </div>
           </div>
@@ -177,6 +157,7 @@ function Education({ entries, onChange }) {
                 minQueryLength={1}
                 maxResults={12}
                 typeLabel="Type College"
+                capitalize
               />
             </div>
             <div className="form-group">
@@ -189,6 +170,7 @@ function Education({ entries, onChange }) {
                 minQueryLength={1}
                 maxResults={12}
                 typeLabel="Type University"
+                capitalize
               />
             </div>
           </div>

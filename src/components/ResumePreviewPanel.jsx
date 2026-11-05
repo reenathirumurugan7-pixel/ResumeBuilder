@@ -10,7 +10,7 @@ const MIN_ZOOM = 0.25
 const MAX_ZOOM = 3
 const ZOOM_STEP = 0.25
 
-export default function ResumePreviewPanel({ config, data, resumeType, qrCodeEnabled = false, resumeId = null, children }) {
+export default function ResumePreviewPanel({ config, data, resumeType, qrCodeEnabled = false, resumeId = null, panelRef = null, children }) {
   const viewportRef = useRef(null)
   // Auto-fit keeps the page width matched to the viewport; manual zooming takes
   // over once the user steps the size up or down.
@@ -89,7 +89,7 @@ export default function ResumePreviewPanel({ config, data, resumeType, qrCodeEna
                 </div>
                 <div className="editor-preview-scaler">
                   <div className="editor-preview-viewport" ref={viewportRef}>
-                    <div className="editor-preview-page" style={{ zoom: scale }}>
+                    <div className="editor-preview-page" ref={panelRef} style={{ zoom: scale }}>
                       <LiveResumePreview config={config} data={data} resumeType={resumeType} qrCodeEnabled={qrCodeEnabled} resumeId={resumeId} />
                     </div>
                   </div>

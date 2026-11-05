@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import './Typeahead.css'
+import { capitalizeInputValue, capitalizeWords } from '../utils/capitalize'
 
 function Typeahead({
   options = [],
@@ -9,10 +10,13 @@ function Typeahead({
   minQueryLength = 0,
   maxResults = 12,
   typeLabel = null,
+  capitalize = false,
 }) {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const inputRef = useRef(null)
+
+  const applyCapitalization = (nextValue) => (capitalize ? capitalizeWords(nextValue) : nextValue)
 
   const query = value.trim().toLowerCase()
   const allMatches = options.filter((opt) => opt.toLowerCase().includes(query))
@@ -28,7 +32,7 @@ function Typeahead({
       onChange('')
       if (inputRef.current) inputRef.current.focus()
     } else {
-      onChange(opt)
+      onChange(applyCapitalization(opt))
     }
     setActiveIndex(-1)
   }
@@ -95,7 +99,7 @@ function Typeahead({
         placeholder={placeholder}
         value={value}
         onChange={(e) => {
-          onChange(e.target.value)
+          onChange(capitalize ? capitalizeInputValue(e) : e.target.value)
           setOpen(true)
           setActiveIndex(-1)
         }}

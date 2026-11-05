@@ -3,6 +3,28 @@ import { useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Login.css'
 
+const DEFAULT_RETURN_PATH = '/resume-type'
+const RETURN_PATH_BASE = 'http://internal.local'
+
+function getSafeReturnPath(from) {
+  const raw =
+    typeof from === 'string'
+      ? from
+      : from && typeof from.pathname === 'string'
+        ? `${from.pathname}${typeof from.search === 'string' ? from.search : ''}${typeof from.hash === 'string' ? from.hash : ''}`
+        : ''
+
+  if (!raw.startsWith('/')) return DEFAULT_RETURN_PATH
+
+  try {
+    const url = new URL(raw, RETURN_PATH_BASE)
+    if (url.origin !== RETURN_PATH_BASE) return DEFAULT_RETURN_PATH
+    return `${url.pathname}${url.search}${url.hash}`
+  } catch {
+    return DEFAULT_RETURN_PATH
+  }
+}
+
 function Login() {
   const { user, loading, login, register, resetPassword } = useAuth()
   const location = useLocation()
@@ -15,7 +37,7 @@ function Login() {
   const [busy, setBusy] = useState(false)
   const [resetSent, setResetSent] = useState(false)
 
-  const from = location.state?.from?.pathname || '/resume-type'
+  const from = getSafeReturnPath(location.state?.from)
 
   if (loading) {
     return (

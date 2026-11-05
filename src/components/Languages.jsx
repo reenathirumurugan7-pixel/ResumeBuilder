@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Globe, Plus, X } from 'lucide-react'
 import './Languages.css'
+import { capitalizeInputValue, capitalizeWords } from '../utils/capitalize'
 
 const LANGUAGE_OPTIONS = [
   'English',
@@ -50,7 +51,7 @@ function Languages({ languages, onChange }) {
   }
 
   const addLanguage = (value) => {
-    const trimmed = (value == null ? name : value).trim()
+    const trimmed = capitalizeWords((value == null ? name : value).trim())
     if (!trimmed) return
     const exists = list.some((lang) => lang.name.trim().toLowerCase() === trimmed.toLowerCase())
     if (!exists) {
@@ -114,7 +115,7 @@ function Languages({ languages, onChange }) {
             placeholder="Select or type a language"
             value={name}
             onChange={(e) => {
-              setName(e.target.value)
+              setName(capitalizeInputValue(e))
               setOpen(true)
               setActiveIndex(-1)
             }}

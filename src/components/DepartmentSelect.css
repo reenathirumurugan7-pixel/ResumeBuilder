@@ -1,0 +1,123 @@
+.department-select {
+  position: relative;
+  width: 100%;
+}
+
+.department-select-input {
+  padding-right: 38px;
+}
+
+.department-select-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.department-select-clear:hover,
+.department-select-clear:focus-visible {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.department-select-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  max-height: 280px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  overscroll-behavior: contain;
+}
+
+.department-select-group {
+  position: sticky;
+  top: -6px;
+  z-index: 1;
+  padding: 8px 10px 5px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.department-select-option {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.department-select-option:hover,
+.department-select-option-active {
+  background: var(--primary-50);
+  color: var(--primary);
+}
+
+.department-select-option-selected {
+  font-weight: 600;
+}
+
+.department-select-option-custom {
+  margin-top: 4px;
+  border: 1px dashed var(--primary-200);
+  background: var(--primary-50);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.department-select-option-clear {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.department-select-hint {
+  padding: 8px 12px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .department-select-list {
+    max-height: min(55vh, 320px);
+  }
+
+  .department-select-input {
+    font-size: 16px;
+  }
+
+  .department-select-option {
+    padding: 11px 12px;
+    font-size: 0.92rem;
+  }
+
+  .department-select-group {
+    padding-top: 9px;
+    font-size: 0.7rem;
+  }
+}
